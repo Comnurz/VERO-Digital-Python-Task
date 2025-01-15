@@ -51,21 +51,22 @@ def generate_xlsx(vehicles, column_titles, is_colored=True):
     ws.append(column_titles)
     for item in vehicles:
         ws.append([item[title] for title in column_titles])
-        if is_colored or 'labelIds' in column_titles:
+        if is_colored and 'hu' in column_titles:
             for cell in ws[ws.max_row]:
-                if is_colored:
-                    cell.fill = get_color_code(item.get("hu"))
-                if 'labelIds' in column_titles and cell.col_idx == column_titles.index('labelIds') + 1:
-                    if cell.value is not None and bool(cell.value):
-                        cell.font = Font(color=item.get('labelIds').split(',')[0])
+                cell.fill = get_color_code(item.get("hu"))
+
+        if 'labelIds' in column_titles:
+            cell = ws.cell(row=ws.max_row, column=column_titles.index('labelIds') + 1)
+            if cell.value is not None and bool(cell.value):
+                cell.font = Font(color=item.get('labelIds').split(',')[0])
     wb.save(f"vehicles_{datetime.now().isoformat()}.xlsx")
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="CLI with one required and two optional arguments.")
-    parser.add_argument("csv_path", type=str, help="A required argument.")
-    parser.add_argument("-k", "--keys", type=str, help="An optional argument with a default value.")
-    parser.add_argument("-c", "--colored", type=bool, default=True, help="Another optional argument with a default value.")
+    parser = argparse.ArgumentParser(description="CLI for generating excel from vehicle data")
+    parser.add_argument("csv_path", type=str, help="Csv file path")
+    parser.add_argument("-k", "--keys", type=str, help="Excel Keys")
+    parser.add_argument("-c", "--colored", type=bool, default=True, help="Is colored?")
     args = parser.parse_args()
     csv_path = args.csv_path
 
