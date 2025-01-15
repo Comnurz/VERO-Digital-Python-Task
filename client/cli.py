@@ -44,19 +44,20 @@ def upload_csv(csv_path):
     return res.json()
 
 
-def generate_xlsx(merged_list, keys, is_colored=True):
+def generate_xlsx(vehicles, column_titles, is_colored=True):
     wb = Workbook()
     ws = wb.active
-    ws.title = "Merged"
-    ws.append(list(keys))
-    for item in merged_list:
-        ws.append([item[key] for key in keys])
-        if is_colored:
+    ws.title = "vehicles"
+    ws.append(column_titles)
+    for item in vehicles:
+        ws.append([item[title] for title in column_titles])
+        if is_colored or 'labelIds' in column_titles:
             for cell in ws[ws.max_row]:
-                cell.fill = get_color_code(item.get("hu"))
-                # FIXME: fill cell font color
-                if cell == 'labelIds':
-                    cell.font = Font(color=item.get('labelIds'))
+                if is_colored:
+                    cell.fill = get_color_code(item.get("hu"))
+                if 'labelIds' in column_titles and cell.col_idx == column_titles.index('labelIds') + 1:
+                    if cell.value is not None and bool(cell.value):
+                        cell.font = Font(color=item.get('labelIds').split(',')[0])
     wb.save(f"vehicles_{datetime.now().isoformat()}.xlsx")
 
 
@@ -77,4 +78,4 @@ if __name__ == "__main__":
         keys = keys | set(args.keys.split(','))
     merged_list = upload_csv(csv_path)
     sorted_list = sorted(merged_list, key=lambda x: x['gruppe'])
-    generate_xlsx(sorted_list, keys, args.colored)
+    generate_xlsx(sorted_list, list(keys), args.colored)
