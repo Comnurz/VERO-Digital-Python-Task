@@ -10,7 +10,8 @@ class BaubuddyClient:
             "Authorization": "Basic QVBJX0V4cGxvcmVyOjEyMzQ1NmlzQUxhbWVQYXNz",
             "Content-Type": "application/json"
         }
-        res = requests.post(
+        res = requests.request(
+            'POST',
             self.BASE_URL.format("login"),
             json={"username": self.USERNAME, "password": self.PASSWORD},
             headers=headers
@@ -19,7 +20,9 @@ class BaubuddyClient:
         self.TOKEN = res.json()['oauth']["access_token"]
 
     def _request(self, method, url, **kwargs):
-        res = requests.request(method, url, **kwargs)
+        res = requests.request(method, f'{self.BASE_URL}/{url}',
+                               headers={"Authorization": f"Bearer {self.TOKEN}"},
+                               **kwargs)
         if res.status_code == 401:
             self._authenticate()
             return self._request(method, url, **kwargs)
@@ -29,14 +32,12 @@ class BaubuddyClient:
 
     def get_vehicles(self):
         res = self._request("GET",
-            self.BASE_URL.format("v1/vehicles/select/active"),
-            headers={"Authorization": f"Bearer {self.TOKEN}"}
+            "v1/vehicles/select/active"
         )
         return res
 
     def get_colors(self, label_id: int):
         res = self._request("GET",
-            self.BASE_URL.format(f"v1/labels/{label_id}"),
-            headers={"Authorization": f"Bearer {self.TOKEN}"}
+            f"v1/labels/{label_id}"
         )
         return res[0]["colorCode"]
