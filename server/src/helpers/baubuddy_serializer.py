@@ -1,7 +1,7 @@
 from helpers.baubuddy_client import BaubuddyClient
 
 
-def calculate_similarity_score(dict1: dict, dict2: dict):
+def calculate_similarity_score(dict1: dict, dict2: dict) -> float:
     """
     Compare two dictionaries and return a similarity score based on matching key-value pairs.
     """
@@ -18,12 +18,13 @@ def calculate_similarity_score(dict1: dict, dict2: dict):
 
     return score / total_keys if total_keys > 0 else 0
 
-def merge_based_on_similarity(api_response: list, csv_response: list, threshold: float = 0.5):
+def merge_based_on_similarity(api_response: list, csv_response: list, threshold: float = 0.5) -> list[dict]:
     """
     Merge dictionaries from two lists.
     """
-    def merge_dicts(dict1, dict2):
-        return {key: dict1.get(key) if dict1.get(key) is not None else dict2.get(key) for key in dict1.keys() | dict2.keys()}
+    def merge_dicts(dict1, dict2) -> dict:
+        keys = dict1.keys() | dict2.keys()
+        return {key: dict1.get(key) if dict1.get(key) is not None else dict2.get(key) for key in keys}
 
     merged = []
     for item1 in api_response:
@@ -36,10 +37,10 @@ def merge_based_on_similarity(api_response: list, csv_response: list, threshold:
     return merged
 
 
-def filter_data_by_column_is_not_none(merged_items: list, column_name: str="hu"):
+def filter_data_by_column_is_not_none(merged_items: list, column_name: str="hu") -> list[dict]:
     return [i for i in merged_items if i.get(column_name) and i.get(column_name).strip()]
 
-def setup_colors(merged_items: list, client: BaubuddyClient):
+def setup_colors(merged_items: list, client: BaubuddyClient) -> list[dict]:
     for item in merged_items:
         if label_ids := item.get("labelIds"):
             label_colors = []

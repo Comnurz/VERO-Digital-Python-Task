@@ -5,7 +5,7 @@ class BaubuddyClient:
     BASE_URL = "https://api.baubuddy.de/index.php"
     USERNAME, PASSWORD = "365", "1"
 
-    def _authenticate(self):
+    def _authenticate(self) -> None:
         headers = {
             "Authorization": "Basic QVBJX0V4cGxvcmVyOjEyMzQ1NmlzQUxhbWVQYXNz",
             "Content-Type": "application/json"
@@ -19,7 +19,7 @@ class BaubuddyClient:
         res.raise_for_status()
         self.TOKEN = res.json()['oauth']["access_token"]
 
-    def _request(self, method: str, url: str, raise_exception: bool = False, **kwargs):
+    def _request(self, method: str, url: str, raise_exception: bool = False, **kwargs) -> dict:
         # infinite loop protection
         res = requests.request(method, f'{self.BASE_URL}/{url}',
                                headers={"Authorization": f"Bearer {self.TOKEN}"},
@@ -31,12 +31,12 @@ class BaubuddyClient:
         return res.json()
 
 
-    def get_vehicles(self):
+    def get_vehicles(self) -> dict:
         return self._request("GET",
             "v1/vehicles/select/active"
         )
 
-    def get_colors(self, label_id: int):
+    def get_colors(self, label_id: int) -> str:
         res = self._request("GET",
             f"v1/labels/{label_id}"
         )
