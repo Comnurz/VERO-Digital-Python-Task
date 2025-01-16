@@ -1,7 +1,5 @@
 import random
 
-from helpers.baubuddyClient import get_colors
-
 def calculate_similarity_score(dict1, dict2):
     """
     Compare two dictionaries and return a similarity score based on matching key-value pairs.
@@ -37,12 +35,13 @@ def merge_based_on_similarity(list1, list2, threshold=0.5):
 def filter_data_by_column_is_not_none(merged_items, column_name="hu"):
     return [i for i in merged_items if i.get(column_name) is not None and bool(i.get(column_name) and i.get(column_name).strip())]
 
-def setup_colors(merged_items):
+def setup_colors(merged_items, client):
     for item in merged_items:
         if item.get("labelIds") is not None and bool(item.get("labelIds")):
             label_colors = []
             for label in item.get("labelIds").strip().split(","):
-                label_colors.append(get_colors(label))
+                label_colors.append(client.get_colors(label))
             item["labelIds"] = ','.join(label_colors)
+            # "134,133"
 
     return merged_items
