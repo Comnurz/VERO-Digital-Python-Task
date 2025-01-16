@@ -1,4 +1,7 @@
-def calculate_similarity_score(dict1, dict2):
+from helpers.baubuddy_client import BaubuddyClient
+
+
+def calculate_similarity_score(dict1: dict, dict2: dict):
     """
     Compare two dictionaries and return a similarity score based on matching key-value pairs.
     """
@@ -15,7 +18,7 @@ def calculate_similarity_score(dict1, dict2):
 
     return score / total_keys if total_keys > 0 else 0
 
-def merge_based_on_similarity(api_response, csv_response, threshold=0.5):
+def merge_based_on_similarity(api_response: list, csv_response: list, threshold: float = 0.5):
     """
     Merge dictionaries from two lists.
     """
@@ -33,16 +36,15 @@ def merge_based_on_similarity(api_response, csv_response, threshold=0.5):
     return merged
 
 
-def filter_data_by_column_is_not_none(merged_items, column_name="hu"):
-    return [i for i in merged_items if i.get(column_name) is not None and bool(i.get(column_name) and i.get(column_name).strip())]
+def filter_data_by_column_is_not_none(merged_items: list, column_name: str="hu"):
+    return [i for i in merged_items if i.get(column_name) and i.get(column_name).strip()]
 
-def setup_colors(merged_items, client):
+def setup_colors(merged_items: list, client: BaubuddyClient):
     for item in merged_items:
-        if item.get("labelIds") is not None and bool(item.get("labelIds")):
+        if label_ids := item.get("labelIds"):
             label_colors = []
-            for label in item.get("labelIds").strip().split(","):
+            for label in label_ids.strip().split(","):
                 label_colors.append(client.get_colors(label))
             item["labelIds"] = ','.join(label_colors)
-            # "134,133"
 
     return merged_items

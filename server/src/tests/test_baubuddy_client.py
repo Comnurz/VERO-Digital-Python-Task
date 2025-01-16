@@ -2,7 +2,6 @@ import unittest
 from unittest.mock import patch, MagicMock, Mock
 
 import requests
-from charset_normalizer.cli import cli_detect
 
 from helpers.baubuddy_client import BaubuddyClient
 
@@ -53,6 +52,20 @@ class TestBaubuddyClient(unittest.TestCase):
         client.TOKEN = 'invalid_token'
         result = client._request('GET', 'https://127.0.0.1:8000/index.php/v1/test')
         self.assertEqual(result, {'data': 'test_data'})
+        mock_authenticate.assert_called_once()
+
+    @patch('src.helpers.baubuddy_client.requests.request')
+    @patch.object(BaubuddyClient, '_authenticate')
+    def test_request_check_if_it_raises_error(self, mock_authenticate, mock_request):
+        mock_request.side_effect = [
+            MagicMock(status_code=401, raise_for_status=Mock(side_effect=requests.exceptions.HTTPError)),
+            MagicMock(status_code=401, raise_for_status=Mock(side_effect=requests.exceptions.HTTPError)),
+            MagicMock(status_code=200, json=Mock(return_value={'data': 'test_data'}))]
+        mock_authenticate.return_value = 'invalid_token'
+        client = BaubuddyClient()
+        client.TOKEN = 'invalid_token'
+        with self.assertRaises(requests.exceptions.HTTPError):
+            client._request('GET', 'https://127.0.0.1:8000/index.php/v1/test')
         mock_authenticate.assert_called_once()
 
     @patch.object(BaubuddyClient, '_request')

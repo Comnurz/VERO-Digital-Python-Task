@@ -1,0 +1,7 @@
+[run]
+source = ./src/
+omit = ./venv/*,*/tests/*,*__init__.py
+
+[report]
+skip_empty = true
+omit = ./venv/*,*/tests/*,*__init__.py

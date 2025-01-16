@@ -11,7 +11,7 @@ from datetime import datetime
 from openpyxl.styles import PatternFill, Font
 
 
-def get_color_code(hu):
+def get_color_code(hu: str):
     hu_not_older_than_three_months = "007500" # Green
     hu_not_older_than_twelve_months = "FFA500" # Orange
     hu_older_than_twelve_months = "b30000" # Red
@@ -37,14 +37,14 @@ def get_color_code(hu):
         )
 
 
-def upload_csv(csv_path):
-    print(f"Uploading {csv_path}...")
-    res = requests.post("http://127.0.0.1:8000/upload", files={"file": open(csv_path, "rb")})
+def upload_csv(path_of_csv: str):
+    print(f"Uploading {path_of_csv}...")
+    res = requests.post("http://127.0.0.1:8000/upload", files={"file": open(path_of_csv, "rb")})
     res.raise_for_status()
     return res.json()
 
 
-def generate_xlsx(vehicles, column_titles, is_colored=True):
+def generate_xlsx(vehicles: list[dict], column_titles: list[str], is_colored: bool = True):
     wb = Workbook()
     ws = wb.active
     ws.title = "vehicles"
@@ -57,7 +57,7 @@ def generate_xlsx(vehicles, column_titles, is_colored=True):
 
         if 'labelIds' in column_titles:
             cell = ws.cell(row=ws.max_row, column=column_titles.index('labelIds') + 1)
-            if cell.value is not None and bool(cell.value):
+            if cell.value:
                 cell.font = Font(color=item.get('labelIds').split(',')[0])
     wb.save(f"vehicles_{datetime.now().isoformat()}.xlsx")
 

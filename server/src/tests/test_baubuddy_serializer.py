@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import MagicMock, patch, Mock
+from unittest.mock import patch, Mock
 from helpers.baubuddy_serializer import (filter_data_by_column_is_not_none,
                                          setup_colors, merge_based_on_similarity, calculate_similarity_score)
 
@@ -27,7 +27,7 @@ class TestBaubuddySerializer(unittest.TestCase):
             {"hu": " ", "other": "data4"},
             {"hu": "", "other": "data5"}
         ]
-        result = filter_data_by_column_is_not_none(items, 'other')
+        result = filter_data_by_column_is_not_none(items, "other")
         self.assertEqual(result, result)
 
     def test_filter_data_by_column_name_is_not_none_with_empty_list(self):
